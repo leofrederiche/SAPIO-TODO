@@ -3,44 +3,6 @@ import { styles } from "./styles"
 
 import { API } from "../../global/api"
 
-// const tasks = [
-//     {
-//         id: 1,
-//         description: "Code Challenge Saipo",
-//         owner: "Leonardo Frederiche",
-//         mail: "leofrederiche@gmail.com",
-//         complete: false,
-//         pendingCount: 0
-//     },
-
-//     {
-//         id: 2,
-//         description: "Start Saipo Project",
-//         owner: "Leonardo Frederiche",
-//         mail: "leofrederiche@gmail.com",
-//         complete: true,
-//         pendingCount: 2
-//     },
-
-//     {
-//         id: 3,
-//         description: "End Saipo Project",
-//         owner: "Leonardo Frederiche",
-//         mail: "leofrederiche@gmail.com",
-//         complete: false,
-//         pendingCount: 1
-//     },
-
-//     {
-//         id: 4,
-//         description: "Sleep",
-//         owner: "Leonardo Frederiche",
-//         mail: "leofrederiche@gmail.com",
-//         complete: false,
-//         pendingCount: 0
-//     },
-// ]
-
 export const List = ({ completed }) => {
 
     const [tasks, setTasks] = useState([])
@@ -75,10 +37,22 @@ export const List = ({ completed }) => {
         )
     }
 
+    const sortTask = (a, b) => {
+        let completeA = a.complete,
+            completeB = b.complete,
+            descriptionA = a.description.toUpperCase(),
+            descriptionB = b.description.toUpperCase()
+
+        let sortByComplete = completeA == completeB ? 0 : completeB ? -1 : 1
+        let sortByName = descriptionA == descriptionB ? 0 : descriptionA > descriptionB ? 1 : -1
+
+        return sortByComplete || sortByName
+    }
+
     return (
         <div style={ styles.listContainer } >
             {
-                tasks.length > 0 && tasks && tasks.sort((a, b) => a.complete == true).map( task => (
+                tasks.length > 0 && tasks && tasks.sort(sortTask).map( task => (
                     handleItem(task)
                 ))
             }

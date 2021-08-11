@@ -23,7 +23,6 @@ export const styles = {
         backgroundColor: colors.active,
         width: "80%",
         align: "center",
-        overflow: "scroll",
-        overflowX: "hidden",
+        overflow: "hidden",
     }
 }
