@@ -15,13 +15,18 @@ export const styles = {
         flexDirection: "row",
         justifyContent: "space-between",
         margin: 10,
-        padding: 10,
-        borderTopWidth: 0,
+        padding: "20px 10px",
+        borderTopWidth: 1,
         borderLeftWidth: 0,
         borderRightWidth: 0,
         borderBottomWidth: 1,
         borderStyle: "solid",
-        borderColor: "#777",
+        borderColor: "#eee",
+    },
+
+    checkbox: {
+        transform: "scale(1.6)",
+        margin: "0px 10px"
     },
 
     taskData: {
