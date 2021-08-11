@@ -1,5 +1,7 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { styles } from "./styles"
+
+import { API } from "../../global/api"
 
 const tasks = [
     {
@@ -40,6 +42,18 @@ const tasks = [
 ]
 
 export const List = ({ completed }) => {
+
+    const [bdTasks, setTasks] = useState([])
+
+    useEffect(() => {
+        API.get("/tasks")
+        .then( response => {
+            console.log("Dados recebidos: ", response.data)
+        })
+        .catch( error => {
+            console.log("Erro ao consultar os dados:", error)
+        })
+    }, [])
 
     const handleItem = (task) => {
         return (
