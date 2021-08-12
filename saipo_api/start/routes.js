@@ -17,3 +17,19 @@ Route.post('/task', async ({ request }) => {
 
     return task
 })
+
+Route.put("/task", async ({ request }) => {
+    const updateTask = request.body
+
+    const task = await Task.find(updateTask.id)
+
+    if (updateTask.pendingCount == 0) {
+        return task
+    }
+
+    task.pendingCount -= 1
+    task.complete = updateTask.complete
+    task.save()
+
+    return task
+})

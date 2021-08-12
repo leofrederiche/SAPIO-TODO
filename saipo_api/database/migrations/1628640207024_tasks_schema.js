@@ -11,7 +11,7 @@ class TasksSchema extends Schema {
       table.string('owner', 50).notNullable()
       table.string('mail', 255).notNullable()
       table.boolean('complete').defaultTo(false)
-      table.integer('pendingCount').defaultTo(2)
+      table.integer('pendingCount').defaultTo(5)
       table.timestamps()
     })
   }
