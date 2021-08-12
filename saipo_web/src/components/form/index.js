@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
+import Modal from "react-modal"
 import { styles } from "./styles"
 
 import { API } from "../../global/api"
@@ -8,16 +9,30 @@ export const Form = ({ refreshTasks }) => {
     const [description, setDescription] = useState("")
     const [owner, setOwner] = useState("")
     const [mail, setMail] = useState("")
+    const [mailSuggest, setMailSuggest] = useState("")
 
-    const SendData = async () => {
+    const [modalOpen, setModalOpen] = useState(false)
+    const [modalLabel, setModalLabel] = useState("")
+    const [modalStyle, setModalStyle] = useState("ok") // ok || select
 
-        const validate = await validateEmail()
+    const showModal = ({ label, style, action }) => {
+        setModalOpen(true)
+        setModalLabel(label)
+        setModalStyle(style)
+    }
 
-        console.log("chegou o retorno: ", validate)
+    const sendData = async () => {
 
-        if (!validate.valid) {
-            alert("Sugestão de E-mail inserida.")
-            setMail(validate.mail)
+        const validMail = await validateEmail()
+
+        if (!validMail.valid) {
+            setMailSuggest(validMail.mail)
+
+            showModal({
+                label: `Você quis dizer ${validMail.mail}?`,
+                style: "option",
+            })
+
             return
         }
 
@@ -45,12 +60,13 @@ export const Form = ({ refreshTasks }) => {
                 if (format_valid && mx_found) {
                     return { valid: true, mail }
                 } else {
-                    return { valid: false, mail: did_you_mean }
+                    return { valid: false, mail: did_you_mean}
                 }
             })
             .catch( error => {
                 console.log("Erro ao validar o E-mail", error)
-                return { valid: false, mail: "Erro ao validar o E-mail" }
+                // setMailSuggest(mail)
+                return { valid: false, mail }
             })
     }
 
@@ -82,10 +98,39 @@ export const Form = ({ refreshTasks }) => {
 
             <button 
                 style={ styles.button }
-                onClick={ SendData }
+                onClick={ sendData }
             >
                 Enviar
             </button>
+
+
+            <Modal 
+                isOpen={ modalOpen }
+                style={ styles.modal }
+            >
+                <h3>{ modalLabel }</h3>
+
+                {
+                    modalStyle === "ok" ? (
+                        <div>
+                            <button onClick={ () => setModalOpen(false) }>OK</button>
+                        </div>
+                    ) : (
+                        <div>
+                            <button 
+                                onClick={ () => { 
+                                    setMail(mailSuggest)
+                                    setModalOpen(false)
+                                }}
+                            >
+                                Sim
+                            </button>
+
+                            <button onClick={ () => setModalOpen(false) }>Não</button>
+                        </div>
+                    )
+                }
+            </Modal>
         </div>
     )
 }
