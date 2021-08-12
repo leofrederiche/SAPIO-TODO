@@ -13,7 +13,7 @@ export const List = ({ allTasks }) => {
 
     const changeTaskStatus = (task) => {
         if (task.pendingCount === 0) {
-            //alert("Essa tarefa já foi alterada mais de 2x")
+            alert("Essa tarefa já foi alterada mais de 2x")
             return false
         }
 
@@ -67,22 +67,10 @@ export const List = ({ allTasks }) => {
         )
     }
 
-    const sortTask = (a, b) => {
-        let completeA = a.complete,
-            completeB = b.complete,
-            descriptionA = a.description.toUpperCase(),
-            descriptionB = b.description.toUpperCase()
-
-        let sortByComplete = completeA === completeB ? 0 : completeB ? -1 : 1
-        let sortByName = descriptionA === descriptionB ? 0 : descriptionA > descriptionB ? 1 : -1
-
-        return sortByComplete || sortByName
-    }
-
     return (
         <div style={ styles.listContainer } >
             {
-                tasks.length > 0 && tasks && tasks.sort(sortTask).map( task => (
+                tasks.length > 0 && tasks && tasks.map( task => (
                     handleItem(task)
                 ))
             }
