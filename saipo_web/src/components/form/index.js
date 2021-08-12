@@ -3,7 +3,7 @@ import { styles } from "./styles"
 
 import { API } from "../../global/api"
 
-export const Form = () => {
+export const Form = ({ includeTask }) => {
     const [description, setDescription] = useState("")
     const [owner, setOwner] = useState("")
     const [mail, setMail] = useState("")
@@ -17,7 +17,8 @@ export const Form = () => {
 
         API.post("/task", newTask)
         .then( response => {
-            alert("Dados gravados com sucesso!" + JSON.stringify(response.data))
+            alert("Dados gravados com sucesso!")
+            includeTask(response.data)
         })
         .catch( error => {
             alert("Erro ao gravar os dados: " + error.message)

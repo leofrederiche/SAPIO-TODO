@@ -1,5 +1,3 @@
-import { colors } from "../../global/colors"
-
 export const styles = {
     listContainer: {
         display: "flex",
