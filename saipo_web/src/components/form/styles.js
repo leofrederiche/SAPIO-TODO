@@ -20,6 +20,7 @@ export const styles = {
         color: colors.active,
         padding: "10px 20px",
         borderRadius: 6,
-        border: "none"
-    }
+        border: "none",
+        margin: "0px 5px"
+    },
 }

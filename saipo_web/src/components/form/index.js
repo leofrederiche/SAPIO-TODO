@@ -1,29 +1,40 @@
-import React, { useEffect, useState } from "react"
-import Modal from "react-modal"
+import React, { useState } from "react"
 import { styles } from "./styles"
 
 import { API } from "../../global/api"
 import { MailBoxLayer, socketURL } from "../../global/mailBoxLayer"
+import { CustomModal } from "../modal"
 
 export const Form = ({ refreshTasks }) => {
     const [description, setDescription] = useState("")
     const [owner, setOwner] = useState("")
     const [mail, setMail] = useState("")
     const [mailSuggest, setMailSuggest] = useState("")
+    const [loading, setLoading] = useState(false)
 
     const [modalOpen, setModalOpen] = useState(false)
     const [modalLabel, setModalLabel] = useState("")
     const [modalStyle, setModalStyle] = useState("ok") // ok || select
 
-    const showModal = ({ label, style, action }) => {
+    const showModal = ({ label, style }) => {
         setModalOpen(true)
         setModalLabel(label)
         setModalStyle(style)
     }
 
-    const sendData = async () => {
+    const sendData = async ({ currentMail = null }) => {
+        setLoading(true)
 
-        const validMail = await validateEmail()
+        if (currentMail === null){
+            currentMail = mail
+        }
+        
+        const validMail = await validateEmail({ currentMail })
+
+        if (validMail.mail == "error"){
+            showModal({ label: "E-mail inválido.", style: "ok" })
+            return
+        }
 
         if (!validMail.valid) {
             setMailSuggest(validMail.mail)
@@ -39,34 +50,38 @@ export const Form = ({ refreshTasks }) => {
         const newTask = {
             description,
             owner,
-            mail
+            mail: currentMail
         }
 
         API.post("/task", newTask)
             .then( response => {
-                alert("Dados gravados com sucesso!")
+                showModal({ label: "Tarefa registrada ;)", style: "ok"})
                 refreshTasks()
+                setLoading(false)
             })
             .catch( error => {
                 alert("Erro ao gravar os dados: " + error.message)
+                setLoading(false)
             })
     }
 
-    const validateEmail = async () => {
-        return await MailBoxLayer.get(`${socketURL}email=${mail}`)
+    const validateEmail = async ({ currentMail }) => {
+        return await MailBoxLayer.get(`${socketURL}email=${currentMail}`)
             .then( response => {
-                const { did_you_mean, format_valid, mx_found } = response.data
+                const { did_you_mean, format_valid, mx_found, success } = response.data
 
                 if (format_valid && mx_found) {
-                    return { valid: true, mail }
+                    return { valid: true, mail: currentMail }
                 } else {
+                    if (success === false){
+                        return { valid: false, mail: "error" }
+                    }
                     return { valid: false, mail: did_you_mean}
                 }
             })
             .catch( error => {
                 console.log("Erro ao validar o E-mail", error)
-                // setMailSuggest(mail)
-                return { valid: false, mail }
+                return { valid: false, mail: currentMail }
             })
     }
 
@@ -99,38 +114,22 @@ export const Form = ({ refreshTasks }) => {
             <button 
                 style={ styles.button }
                 onClick={ sendData }
+                disabled={ loading }
             >
-                Enviar
+                { loading ? "Aguarde.." : "Enviar"  }
             </button>
 
 
-            <Modal 
-                isOpen={ modalOpen }
-                style={ styles.modal }
-            >
-                <h3>{ modalLabel }</h3>
-
-                {
-                    modalStyle === "ok" ? (
-                        <div>
-                            <button onClick={ () => setModalOpen(false) }>OK</button>
-                        </div>
-                    ) : (
-                        <div>
-                            <button 
-                                onClick={ () => { 
-                                    setMail(mailSuggest)
-                                    setModalOpen(false)
-                                }}
-                            >
-                                Sim
-                            </button>
-
-                            <button onClick={ () => setModalOpen(false) }>Não</button>
-                        </div>
-                    )
-                }
-            </Modal>
+            <CustomModal 
+                modalOpen={ modalOpen }
+                setModalOpen={ setModalOpen }
+                modalLabel={ modalLabel }
+                modalStyle={ modalStyle }
+                mailSuggest={ mailSuggest }
+                setMail={ setMail }
+                setLoading={ setLoading }
+                sendData={ sendData }
+            />
         </div>
     )
 }
